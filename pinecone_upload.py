@@ -10,7 +10,7 @@ import config
 # Config
 # -----------------------------
 DATA_FILE = "vietnam_travel_dataset.json"
-BATCH_SIZE = 32
+BATCH_SIZE = 10
 
 INDEX_NAME = config.PINECONE_INDEX_NAME
 VECTOR_DIM = config.PINECONE_VECTOR_DIM  # 1536 for text-embedding-3-small
@@ -18,7 +18,11 @@ VECTOR_DIM = config.PINECONE_VECTOR_DIM  # 1536 for text-embedding-3-small
 # -----------------------------
 # Initialize clients
 # -----------------------------
-client = OpenAI(api_key=config.OPENAI_API_KEY)
+client = OpenAI(
+    api_key=config.GEMINI_API_KEY,
+    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+)
+
 pc = Pinecone(api_key=config.PINECONE_API_KEY)
 
 # -----------------------------
@@ -32,8 +36,8 @@ if INDEX_NAME not in existing_indexes:
         dimension=VECTOR_DIM,
         metric="cosine",
         spec=ServerlessSpec(
-            cloud="gcp",
-            region="us-east1-gcp"
+            cloud="aws",
+            region="us-east-1"
         )
     )
 else:
@@ -45,11 +49,17 @@ index = pc.Index(INDEX_NAME)
 # -----------------------------
 # Helper functions
 # -----------------------------
-def get_embeddings(texts, model="text-embedding-3-small"):
-    """Generate embeddings using OpenAI v1.0+ API."""
-    resp = client.embeddings.create(model=model, input=texts)
-    return [data.embedding for data in resp.data]
-
+def get_embeddings(texts, model):
+    try:
+        time.sleep(1)                       # Delay to avoid Rate-limiting on free-tier
+        resp = client.embeddings.create(model=model, input=texts,dimensions=1536)
+        return [data.embedding for data in resp.data]
+    except Exception as e:
+        if "429" in str(e):
+            wait_time = 60
+            time.sleep(wait_time)
+            return get_embeddings(texts, model)
+        raise
 def chunked(iterable, n):
     for i in range(0, len(iterable), n):
         yield iterable[i:i+n]
@@ -82,7 +92,7 @@ def main():
         texts = [item[1] for item in batch]
         metas = [item[2] for item in batch]
 
-        embeddings = get_embeddings(texts, model="text-embedding-3-small")
+        embeddings = get_embeddings(texts, model="gemini-embedding-001")
 
         vectors = [
             {"id": _id, "values": emb, "metadata": meta}
