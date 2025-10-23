@@ -8,7 +8,6 @@ from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 import config
 from embeddings_cache import get_cached_embeddings, save_embeddings 
-
 # -----------------------------
 # Config
 # -----------------------------
@@ -167,7 +166,7 @@ def build_prompt(user_query, pinecone_matches, graph_facts):
     """Build a chat prompt combining vector DB matches and graph facts."""
     system = ("""You are a knowledgeable and friendly travel assistant specializing in Vietnam. Use the provided semantic search results and graph facts to answer the user's query accurately.
     Provide specific recommendations with helpful details, such as activities, timing, and travel tips.
-    When referencing places or activities, use descriptive, human-friendly names that summarize the experience (e.g., “A unique experience in Hoi An    where visitors can enjoy bicycle tours”) and include the node IDs in parentheses for reference.
+    When referencing places or activities, use descriptive, human-friendly names that summarize the experience (e.g., “A unique experience in Hoi An where visitors can enjoy bicycle tours”) and include the node IDs in parentheses for reference.
     Write the itinerary in a clear, well-structured, and reader-friendly format, with natural text—do not return JSON or code.
     Keep your response concise, engaging, and easy to follow, and make it feel like a personalized travel guide."""
     )
@@ -236,7 +235,6 @@ def call_chat(prompt_messages, retry_count=3):
 # Interactive chat
 # -----------------------------
 def main():
-    
     print("\n" + "="*60)
     print("🌏 Vietnam Travel Assistant (Hybrid RAG)")
     print("="*60)
@@ -255,7 +253,7 @@ def main():
             if query.lower() in ("exit", "quit", "q"):
                 print("\n👋 Thanks for using Vietnam Travel Assistant!")
                 break
-            start_time = time.time()
+            
             conversation_count += 1
             print(f"\n[Query {conversation_count}] Processing...\n")
             
@@ -279,8 +277,6 @@ def main():
             print("📝 Answer:")
             print("="*60)
             print(answer)
-            end_time = time.time()
-            print(f"Execution time: {end_time - start_time:.2f} seconds")
             print("="*60 + "\n")
             
         except KeyboardInterrupt:
@@ -293,4 +289,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
