@@ -7,7 +7,7 @@ from pinecone import Pinecone, ServerlessSpec
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 import config
-
+from embeddings_cache import get_cached_embeddings, save_embeddings
 # -----------------------------
 # Config
 # -----------------------------

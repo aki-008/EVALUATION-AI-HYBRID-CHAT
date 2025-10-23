@@ -179,3 +179,5 @@ pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 pinecone_upload.py:Zone.Identifier
+cache/cache.db
+testing /cache/cache.db
