@@ -26,7 +26,7 @@ def save_embeddings(text:str , embeddings, ttl_hours=48):
     data = pickle.dumps(embeddings)
     conn.setex(h, ttl_hours * 3600, data)
 
-
+# Optional
 def get_cached_answer(query: str):
     """Retrieve a cached LLM answer if available."""
     key = f"answer:{get_hash(query)}"
