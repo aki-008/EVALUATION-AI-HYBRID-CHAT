@@ -165,11 +165,11 @@ def fetch_graph_context(node_ids: List[str], neighborhood_depth=1):
 
 def build_prompt(user_query, pinecone_matches, graph_facts):
     """Build a chat prompt combining vector DB matches and graph facts."""
-    system = (
-        "You are a helpful travel assistant for Vietnam. Use the provided semantic search results "
-        "and graph facts to answer the user's query in a friendly, concise manner. "
-        "Provide specific recommendations with details. "
-        "When referencing places, mention their node IDs in parentheses for reference."
+    system = ("""You are a knowledgeable and friendly travel assistant specializing in Vietnam. Use the provided semantic search results and graph facts to answer the user's query accurately.
+    Provide specific recommendations with helpful details, such as activities, timing, and travel tips.
+    When referencing places or activities, use descriptive, human-friendly names that summarize the experience (e.g., “A unique experience in Hoi An    where visitors can enjoy bicycle tours”) and include the node IDs in parentheses for reference.
+    Write the itinerary in a clear, well-structured, and reader-friendly format, with natural text—do not return JSON or code.
+    Keep your response concise, engaging, and easy to follow, and make it feel like a personalized travel guide."""
     )
 
     vec_context = []
