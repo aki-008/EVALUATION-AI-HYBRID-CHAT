@@ -7,7 +7,8 @@ from pinecone import Pinecone, ServerlessSpec
 from neo4j import GraphDatabase
 from neo4j.exceptions import ServiceUnavailable, AuthError
 import config
-from embeddings_cache import get_cached_embeddings, save_embeddings
+from embeddings_cache import get_cached_embeddings, save_embeddings 
+
 # -----------------------------
 # Config
 # -----------------------------
@@ -79,6 +80,10 @@ if not USE_NEO4J:
 # -----------------------------
 def embed_text(text: str, retry_count=3) -> List[float]:
     """Get embedding for a text string with retry logic."""
+    cached = get_cached_embeddings(text)
+    if cached:
+        print("🧠 Cache hit: embedding loaded from Redis")
+        return cached
     for attempt in range(retry_count):
         try:
             # Rate limiting: wait between requests
@@ -89,7 +94,9 @@ def embed_text(text: str, retry_count=3) -> List[float]:
                 input=[text],
                 dimensions=1536
             )
-            return resp.data[0].embedding
+            embedding = resp.data[0].embedding
+            save_embeddings(text, embedding)
+            return embedding
             
         except Exception as e:
             if "429" in str(e):  # Rate limit error
@@ -228,7 +235,8 @@ def call_chat(prompt_messages, retry_count=3):
 # -----------------------------
 # Interactive chat
 # -----------------------------
-def interactive_chat():
+def main():
+    
     print("\n" + "="*60)
     print("🌏 Vietnam Travel Assistant (Hybrid RAG)")
     print("="*60)
@@ -247,7 +255,7 @@ def interactive_chat():
             if query.lower() in ("exit", "quit", "q"):
                 print("\n👋 Thanks for using Vietnam Travel Assistant!")
                 break
-            
+            start_time = time.time()
             conversation_count += 1
             print(f"\n[Query {conversation_count}] Processing...\n")
             
@@ -271,6 +279,8 @@ def interactive_chat():
             print("📝 Answer:")
             print("="*60)
             print(answer)
+            end_time = time.time()
+            print(f"Execution time: {end_time - start_time:.2f} seconds")
             print("="*60 + "\n")
             
         except KeyboardInterrupt:
@@ -282,4 +292,5 @@ def interactive_chat():
 
 if __name__ == "__main__":
 
-    interactive_chat()
+    main()
+

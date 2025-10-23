@@ -53,7 +53,8 @@ def get_embeddings(texts, model):
     try:
         time.sleep(1)                       # Delay to avoid Rate-limiting on free-tier
         resp = client.embeddings.create(model=model, input=texts,dimensions=1536)
-        return [data.embedding for data in resp.data]
+        embedding = resp.data[0].embedding
+        return embedding
     except Exception as e:
         if "429" in str(e):
             wait_time = 60

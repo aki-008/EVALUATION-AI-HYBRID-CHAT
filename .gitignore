@@ -181,3 +181,6 @@ pyrightconfig.json
 pinecone_upload.py:Zone.Identifier
 cache/cache.db
 testing /cache/cache.db
+testing /neo4j_test.ipynb
+scripts/test.py
+
