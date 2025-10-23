@@ -184,3 +184,4 @@ testing /cache/cache.db
 testing /neo4j_test.ipynb
 scripts/test.py
 
+img/photo-collage.png.png:Zone.Identifier
